@@ -1,9 +1,12 @@
 "use server";
 
-import { sql } from "@vercel/postgres";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
+import postgres from "postgres";
+
+const sql = postgres(process.env.DATABASE_URL!, { ssl: "verify-full" });
 
 const FormSchema = z.object({
   id: z.string(),
@@ -60,7 +63,6 @@ export async function updateInvoice(id: string, formData: FormData) {
 }
 
 export async function deleteInvoice(id: string) {
-  throw new Error("Failed to Delete Invoice");
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
     revalidatePath("/dashboard/invoices");
